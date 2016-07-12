@@ -10,7 +10,6 @@
   </parent>
 
   <artifactId>guvnor-asset-mgmt-project</artifactId>
-  <packaging>pom</packaging>
 
   <name>Guvnor - Asset Management Project</name>
   <description>Guvnor - Asset Management Project (includes processes to manage business assets)</description>
@@ -53,20 +52,51 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <!-- Disable the default maven-jar-plugin executions as the main jar will be replaced by the build-migration-maven-plugin (see below) -->
+          <execution>
+            <id>default-jar</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>test-jar</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- Disable the default maven-source-plugin executions as the sources jar will be replaced by the build-migration-maven-plugin (see below) -->
+        <artifactId>maven-source-plugin</artifactId>
         <executions>
           <execution>
-            <id>attach-kjar-to-main-project</id>
-            <phase>package</phase>
+            <id>attach-sources</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>attach-test-sources</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>build-migration-maven-plugin</artifactId>
+        <version>0.5</version>
+        <executions>
+          <execution>
+            <id>replace-main-artifact</id>
             <goals>
-              <goal>attach-artifact</goal>
+              <goal>main-artifact</goal>
             </goals>
             <configuration>
+              <mainArtifact>${project.build.outputDirectory}/kjar/target/${project.artifactId}-${project.version}.jar</mainArtifact>
+              <mainPom>${project.build.outputDirectory}/kjar/pom.xml</mainPom>
               <artifacts>
                 <artifact>
-                  <file>${project.build.outputDirectory}/kjar/target/${project.artifactId}-${project.version}.jar</file>
+                  <file>${project.build.outputDirectory}/kjar/target/${project.artifactId}-${project.version}-sources.jar</file>
                   <type>jar</type>
+                  <classifier>sources</classifier>
                 </artifact>
               </artifacts>
             </configuration>
