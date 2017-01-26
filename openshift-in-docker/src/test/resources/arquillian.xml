@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://jboss.org/schema/arquillian"
+            xsi:schemaLocation="http://jboss.org/schema/arquillian
+    http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+  <extension qualifier="docker">
+
+    <property name="autoStartContainers">[none]</property>
+    <property name="serverVersion">1.22</property>
+    <property name="serverUri">http://localhost:2375</property>
+    <property name="definitionFormat">CUBE</property>
+    <property name="dockerContainers">
+      origin:
+        image: openshift/origin
+        cmd: [start]
+        privileged: true
+        networkMode: host
+        binds:
+          - /:/rootfs:ro
+          - /var/run:/var/run:rw
+          - /sys:/sys
+          - /var/lib/docker:/var/lib/docker:rw
+          - /var/lib/origin/openshift.local.volumes:/var/lib/origin/openshift.local.volumes:rslave
+        exposedPorts: [7001/tcp, 8443/tcp]
+        await:
+          strategy: polling
+          sleepPollingTime: 5 s
+          iterations: 20
+          type: ping
+        portBindings: [7001/tcp, 8443/tcp]
+    </property>
+  </extension>
+</arquillian>
